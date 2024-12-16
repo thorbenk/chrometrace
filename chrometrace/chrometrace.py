@@ -117,6 +117,10 @@ class TraceEvent:
     args: dict[str, JsonEncodable] = dataclasses.field(default_factory=dict)
     # Scope of the event, only applicable for instant events
     scope: ty.Literal["g", "p", "t", None] = dataclasses.field(default=None, metadata={"chrometrace_key": "s"})
+    # A fixed color name to associate with the event.
+    cname: str | None = dataclasses.field(
+        default=None, metadata={"chrometrace_key": "cname"}
+    )
 
     @classmethod
     @functools.lru_cache(maxsize=None)
@@ -253,6 +257,7 @@ class TraceEvent:
         thread_id: int | None,
         categories: list[str] | None = None,
         args: dict[str, JsonEncodable] | None = None,
+        cname: str | None = None,
     ) -> ty.Self:
         """
         Create a complete event
@@ -286,6 +291,7 @@ class TraceEvent:
             thread_id=thread_id,
             args=args or {},
             event_type=TraceEventType.COMPLETE,
+            cname=cname
         )
 
     @classmethod
@@ -346,7 +352,7 @@ class TraceEvent:
 
     @classmethod
     def instant_thread_scope(
-        cls, name: str, timestamp_us: float, process_id: int, thread_id: int, categories: list[str] | None = None
+        cls, name: str, timestamp_us: float, process_id: int, thread_id: int, categories: list[str] | None = None,  cname: str | None = None,
     ) -> ty.Self:
         """
         Create an instant event with process scope
@@ -375,6 +381,7 @@ class TraceEvent:
             thread_id=thread_id,
             event_type=TraceEventType.INSTANT,
             scope="t",
+            cname=cname
         )
 
     @classmethod
